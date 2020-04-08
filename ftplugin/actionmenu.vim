@@ -14,7 +14,7 @@ let s:selected_item = 0
 
 function! actionmenu#open_pum()
   call feedkeys("i\<C-x>\<C-u>")
-endfunction!
+endfunction
 
 function! actionmenu#select_item()
   if pumvisible()
@@ -32,11 +32,19 @@ endfunction
 
 function! actionmenu#on_insert_leave()
   if type(s:selected_item) == type({})
-    call actionmenu#callback(s:selected_item['user_data'], g:actionmenu#items[s:selected_item['user_data']])
+    let g:actionmenu#selection[0] = s:selected_item['user_data']
+    let g:actionmenu#selection[1] = g:actionmenu#items[s:selected_item['user_data']]
     let s:selected_item = 0   " Clear the selected item once selected
   else
-    call actionmenu#callback(-1, 0)
+    let g:actionmenu#selection[0] = -1
+    let g:actionmenu#selection[1] = 0
   endif
+  call actionmenu#close()
+endfunction
+
+function! actionmenu#on_win_leave()
+  exec "wincmd p"
+  call actionmenu#callback(g:actionmenu#selection[0], g:actionmenu#selection[1])
 endfunction
 
 function! actionmenu#pum_item_to_action_item(item, index) abort
@@ -60,6 +68,7 @@ inoremap <nowait><buffer> j <C-n>
 
 " Events
 autocmd InsertLeave <buffer> :call actionmenu#on_insert_leave()
+autocmd WinLeave <buffer> :call actionmenu#on_win_leave()
 
 " pum completion function
 function! actionmenu#complete_func(findstart, base)

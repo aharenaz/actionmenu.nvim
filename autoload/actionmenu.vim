@@ -6,6 +6,7 @@ let s:loaded = 1
 let s:buffer = 0
 let g:actionmenu#win = 0
 let g:actionmenu#items = []
+let g:actionmenu#selection = [ -1, 0 ]
 
 function! actionmenu#icon() abort
   let l:character = strcharpart(strpart(getline('.'), col('.') - 1), 0, 1)    " Current character
